@@ -7,7 +7,7 @@ import { useLoaderData, Link, useFetcher, Form } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import { db } from '~/utils/db.server';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
-import { ChevronLeft, Heart } from 'lucide-react';
+import { CalendarArrowDown, CalendarArrowUp, ChevronLeft, Heart } from 'lucide-react';
 import { FormErrorMessage } from '~/components/FormErrorMessage';
 import { Info } from '~/components/alert/Info';
 import { H1 } from '~/components/ui/H1';
@@ -346,6 +346,17 @@ export default function IssueDetail() {
 
     const commentRef = useRef(null);
 
+    // Load the saved comment order from localStorage
+    const [commentOrder, setCommentOrder] = useState<'asc' | 'desc'>(() => {
+        const savedCommentOrder = localStorage.getItem(`issue-${issue.id}-comment-order`);
+        return savedCommentOrder ? (savedCommentOrder as 'asc' | 'desc') : 'asc';
+    });
+
+    // Save the comment order to localStorage
+    useEffect(() => {
+        localStorage.setItem(`issue-${issue.id}-comment-order`, commentOrder);
+    }, [commentOrder, issue.id]);
+
     useEffect(() => {
         if (fetcher.state === 'idle' && fetcher.data && !fetcher.data?.errors?.message) {
             formRef.current?.reset();
@@ -375,6 +386,14 @@ export default function IssueDetail() {
         }
         setIsFormValid(isCommentTextValid);
     }, [commentText]);
+
+    const sortedComments = [...issue.comments].sort((a, b) => {
+        if (commentOrder === 'asc') {
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        } else {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        }
+    });
 
     const handleSubmit = (e) => {
         if (!isFormValid || fetcher.formData) {
@@ -495,10 +514,20 @@ export default function IssueDetail() {
                         </Info>
                     </div>
                     <div className='mt-8'>
-                        <h2 className='text-2xl font-bold'>Comments</h2>
-                        {issue.comments.length > 0 ? (
+                        <div className='flex justify-between items-center'>
+                            <h2 className='text-2xl font-bold'>Comments</h2>
+                            <Button onClick={() => setCommentOrder(commentOrder === 'asc' ? 'desc' : 'asc')} className='mt-2'>
+                                {commentOrder === 'asc' ? (
+                                    <CalendarArrowUp className='mr-2 h-4 w-4' />
+                                ) : (
+                                    <CalendarArrowDown className='mr-2 h-4 w-4' />
+                                )}
+                                Sort by Date ({commentOrder === 'asc' ? 'Oldest to Newest' : 'Newest to Oldest'})
+                            </Button>
+                        </div>
+                        {sortedComments.length > 0 ? (
                             <ul>
-                                {issue.comments.map((comment) => (
+                                {sortedComments.map((comment) => (
                                     <li key={comment.id}>
                                         <IssueComment comment={comment} issue={issue} />
                                     </li>
