@@ -30,6 +30,7 @@ import {
 import { sendDiscordWebhookWithUrl } from '~/utils/discord.server';
 import { config } from '~/utils/config.server';
 import { formatDate } from '~/utils/date';
+import { Markdown } from '~/components/Markdown';
 
 const COMMENT_MIN_LENGTH = 3;
 const COMMENT_MAX_LENGTH = 5000;
@@ -515,13 +516,14 @@ export default function IssueDetail() {
                                     required
                                     rows={3}
                                     className='w-full px-3 py-2 text-sm text-gray-700 border rounded-lg focus:outline-none'
-                                    placeholder='Add a comment...'
+                                    placeholder='Add a comment... (Markdown is supported.)'
                                     value={commentText}
                                     onChange={(e) => setCommentText(e.target.value)}
                                     minLength={COMMENT_MIN_LENGTH}
                                     maxLength={COMMENT_MAX_LENGTH}
                                     ref={commentRef}
                                 ></textarea>
+                                <Markdown>{commentText}</Markdown>
                                 <div className='flex flex-col'>
                                     {session.role === 'ADMIN' && (
                                         <div className='flex items-center space-x-2 my-4'>

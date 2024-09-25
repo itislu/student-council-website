@@ -15,6 +15,7 @@ import { Textarea } from '~/components/ui/textarea';
 import { sendDiscordWebhook } from '~/utils/discord.server';
 import { SessionData, requireSessionData } from '~/utils/session.server';
 import { validateForm } from '~/utils/validation';
+import { Markdown } from '~/components/Markdown';
 
 export const meta: MetaFunction = () => {
     return [{ title: 'Contact' }, { name: 'description', content: 'Admin Page' }];
@@ -272,6 +273,7 @@ export default function Contact() {
                             ref={messageRef}
                         />
                         <FormErrorMessage className='mt-2'>{contactFetcher.data?.errors?.message}</FormErrorMessage>
+                        <Markdown>{message}</Markdown>
                     </div>
 
                     <div className='mt-4'>

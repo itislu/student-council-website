@@ -19,6 +19,7 @@ import { validateForm } from '~/utils/validation';
 import { ChevronLeft } from 'lucide-react';
 import { sendDiscordWebhookWithUrl } from '~/utils/discord.server';
 import { config } from '~/utils/config.server';
+import { Markdown } from '~/components/Markdown';
 
 const TITLE_MIN_LENGTH = 5;
 const TITLE_MAX_LENGTH = 50;
@@ -248,8 +249,7 @@ export default function IssuesNew() {
                             Issue Description
                         </Label>
                         <Textarea
-                            placeholder="Please describe your issue or suggestion here...
-(Currently we don't support markdown for public issues, but we will in the future.)"
+                            placeholder="Please describe your issue or suggestion here... (Markdown is supported.)"
                             name='description'
                             className={classNames('h-48', {
                                 'border-red-600': !!createIssueFetcher.data?.errors?.description,
@@ -265,6 +265,7 @@ export default function IssuesNew() {
                         <FormErrorMessage className='mt-2'>
                             {createIssueFetcher.data?.errors?.description}
                         </FormErrorMessage>
+                        <Markdown>{description}</Markdown>
                     </div>
 
                     <Info title='Note' className='mt-4 md:w-3/5'>
