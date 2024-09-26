@@ -1,7 +1,7 @@
 import { HTMLAttributes, useState } from 'react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { MenuIcon, Home, Info, TriangleAlert, MessageCircle, DoorOpen, Settings, CirclePlus } from 'lucide-react';
+import { MenuIcon, Home, Info, TriangleAlert, MessageCircle, DoorOpen, Settings, CirclePlus, Vote } from 'lucide-react';
 import { Form, Link, NavLink, useLocation } from '@remix-run/react';
 import classNames from 'classnames';
 import {
@@ -38,6 +38,12 @@ const navItems = [
         label: 'About',
         href: '/about',
         icon: Info,
+    },
+    {
+        label: 'Elections',
+        href: '/elections',
+        icon: Vote,
+        adminOnly: true,
     },
 ];
 
@@ -81,20 +87,25 @@ function MainNav({ login, role }: { login: string; role: 'ADMIN' | 'USER' }) {
     return (
         <div className='hidden md:flex flex-row justify-between w-full items-center'>
             <div className='mr-4 gap-2 flex'>
-                {navItems.map((item, index) => (
-                    <NavLink
-                        key={item.href}
-                        to={item.href}
-                        className={({ isActive, isPending }) => {
-                            return classNames('text-primary underline-offset-4 hover:underline', 'px-2 py-2', {
-                                ' underline font-bold': isActive,
-                            });
-                        }}
-                        end
-                    >
-                        {item.label}
-                    </NavLink>
-                ))}
+                {navItems.map((item, index) => {
+                    if (item.adminOnly && role !== 'ADMIN') {
+                        return null;
+                    }
+                    return (
+                        <NavLink
+                            key={item.href}
+                            to={item.href}
+                            className={({ isActive, isPending }) => {
+                                return classNames('text-primary underline-offset-4 hover:underline', 'px-2 py-2', {
+                                    ' underline font-bold': isActive,
+                                });
+                            }}
+                            end
+                        >
+                            {item.label}
+                        </NavLink>
+                    );
+                })}
             </div>
             <User login={login} role={role} />
         </div>
@@ -122,23 +133,28 @@ function MobileNav({ login, role }: { login: string; role: 'ADMIN' | 'USER' }) {
                             <div className='mb-6 font-bold uppercase text-gray-600'>Student Council</div>
                             <div className='flex flex-col justify-between	'>
                                 <div>
-                                    {navItems.map((item, index) => (
-                                        <NavLink
-                                            key={index}
-                                            to={item.href}
-                                            className={({ isActive, isPending }) => {
-                                                return classNames('mb-4 flex flex-row items-center', {
-                                                    'font-bold': isActive,
-                                                });
-                                            }}
-                                            onClick={() => {
-                                                setOpen(false);
-                                            }}
-                                            end
-                                        >
-                                            <item.icon className='size-5 mr-4' /> <p>{item.label}</p>
-                                        </NavLink>
-                                    ))}
+                                    {navItems.map((item, index) => {
+                                        if (item.adminOnly && role !== 'ADMIN') {
+                                            return null;
+                                        }
+                                        return (
+                                            <NavLink
+                                                key={index}
+                                                to={item.href}
+                                                className={({ isActive, isPending }) => {
+                                                    return classNames('mb-4 flex flex-row items-center', {
+                                                        'font-bold': isActive,
+                                                    });
+                                                }}
+                                                onClick={() => {
+                                                    setOpen(false);
+                                                }}
+                                                end
+                                            >
+                                                <item.icon className='size-5 mr-4' /> <p>{item.label}</p>
+                                            </NavLink>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -159,52 +175,3 @@ export default function NavBar({ login, role }: { login: string; role: 'ADMIN' |
         </header>
     );
 }
-
-// import { NavLink } from "@remix-run/react";
-// import classNames from "classnames";
-// import { Handshake, HardHat, Info } from "lucide-react";
-
-// export function Header() {
-
-// 	return (
-// 		<header className="mt-2 border-b pb-2 px-2">
-// 			<nav className="flex flex-row justify-between items-center mx-2 md:mx-10">
-// 				<ul className="flex flex-row font-bold text-slate-600 space-x-3 md:space-x-5 ">
-// 					<li>
-// 						<NavLink
-// 							to="/about"
-// 							className={({ isActive, isPending }) =>
-// 								classNames({
-// 									"text-slate-600 hover:text-blue-600 transition-colors duration-300":
-// 										!isActive && !isPending,
-// 									"text-blue-600": isActive,
-// 									"text-blue-600 animate-pulse": isPending,
-// 								})
-// 							}
-// 						>
-// 							<Info className="size-5 mr-1" /> About
-// 						</NavLink>
-// 					</li>
-// 					<li>
-// 						<NavLink
-// 							to="/issues"
-// 							className={({ isActive, isPending }) =>
-// 								classNames({
-// 									"text-slate-600 hover:text-green-500 transition-colors duration-300":
-// 										!isActive && !isPending,
-// 									"text-green-500": isActive,
-// 									"text-green-500 animate-pulse": isPending,
-// 								})
-// 							}
-// 						>
-// 							<HardHat className="size-5 mr-1" />
-// 							Issues
-// 						</NavLink>
-// 					</li>
-// 				</ul>
-// 			</nav>
-// 		</header>
-// 	);
-// }
-
-// export default Header;

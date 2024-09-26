@@ -3,6 +3,9 @@ import { Outlet, useLocation } from '@remix-run/react';
 import { ChevronRight } from 'lucide-react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage } from '~/components/ui/breadcrumb';
 import { requireAdmin } from '~/utils/session.server';
+import { useState } from 'react';
+import { Button } from '~/components/ui/button';
+import { db } from '~/utils/db.server';
 
 export const meta: MetaFunction = () => {
     return [{ title: 'Admin' }, { name: 'description', content: 'Admin Page' }];
@@ -15,9 +18,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Admin() {
+    const [electionsTabVisible, setElectionsTabVisible] = useState(false);
+
+    const toggleElectionsTabVisibility = async () => {
+        setElectionsTabVisible(!electionsTabVisible);
+        await db.settings.update({
+            where: { key: 'electionsTabVisible' },
+            data: { value: !electionsTabVisible },
+        });
+    };
+
     return (
         <div>
             <AdminCrumb />
+            <div className='m-4'>
+                <Button onClick={toggleElectionsTabVisibility}>
+                    {electionsTabVisible ? 'Hide Elections Tab' : 'Show Elections Tab'}
+                </Button>
+            </div>
             <Outlet />
         </div>
     );
